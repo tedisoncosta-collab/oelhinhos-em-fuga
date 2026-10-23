@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#79c9f1">
+<meta name="description" content="Coelhinhos em Fuga: jogo casual para celular, protótipo preparado para integração futura de anúncios."><title>Coelhinhos em Fuga — preparação para monetização</title>
+<style>
+:root{--ink:#573b2a;--cream:#fff5d8;--gold:#f8c95b;--green:#5bb85b;--sky:#8bdcff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:system-ui,-apple-system,Arial,sans-serif;color:white;background:#75c9ef;overscroll-behavior:none;touch-action:pan-y}button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+button{font:inherit;cursor:pointer;touch-action:manipulation}
+.game{position:relative;isolation:isolate;max-width:520px;min-height:100dvh;margin:auto;overflow:hidden;padding:9px 10px 94px;background:linear-gradient(180deg,#65c8ff 0%,#c7f0ff 31%,#b3e78a 32%,#66c65a 72%,#37934a 100%)}
+.game:before{content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;background:radial-gradient(ellipse at 15% 40%,#ffffff55 0 1px,transparent 2px),radial-gradient(ellipse at 80% 55%,#fff8 0 1px,transparent 2px);background-size:31px 37px,43px 47px;opacity:.25}
+.cloud{position:absolute;top:90px;font-size:42px;opacity:.6;animation:cloud 18s linear infinite;pointer-events:none}.cloud.c2{top:145px;animation-duration:25s;animation-direction:reverse}
+@keyframes cloud{from{transform:translateX(-90px)}to{transform:translateX(550px)}}
+.hud{position:relative;z-index:4;display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.pill{display:flex;align-items:center;justify-content:space-between;gap:5px;background:linear-gradient(180deg,#fffdf0,#ffe8ae);color:#874c25;border:3px solid #f6d47b;border-radius:14px;padding:7px 9px;font-weight:900;box-shadow:0 4px 0 #a97537, inset 0 2px 0 #fff;font-size:clamp(14px,4vw,18px)}
+.pill .ico{font-size:23px}.banner{position:relative;z-index:4;margin:10px 0 8px;text-align:center;border:2px solid #fff1bc;border-radius:18px;background:linear-gradient(#ff7c64,#e84c45);padding:7px;font-weight:900;font-size:clamp(13px,3.6vw,16px);box-shadow:0 3px #ad3835}
+.scene{position:relative;z-index:1;height:calc(100dvh - 240px);min-height:430px;max-height:700px;border-radius:24px;overflow:hidden;border:4px solid #f5d78c;background:linear-gradient(180deg,#8edcff 0 27%,#d1f2a0 27% 45%,#8bd66a 45% 100%);box-shadow:inset 0 0 0 3px #fff5d4,0 6px #398a45,0 12px 24px #175d3433}
+.sun{position:absolute;right:9%;top:5%;font-size:42px;filter:drop-shadow(0 3px 1px #d9a94a);animation:sunGlow 4s ease-in-out infinite}
+@keyframes sunGlow{50%{filter:drop-shadow(0 0 9px #fff1a0)}}
+.scene:before{content:"";position:absolute;left:-12%;right:-12%;top:19%;height:27%;border-radius:50%;background:linear-gradient(180deg,#a2df7c,#6cc65b);box-shadow:0 8px 0 #5ab64e}
+.scene:after{content:"";position:absolute;left:-10%;right:-10%;bottom:-15%;height:40%;border-radius:50%;background:linear-gradient(180deg,#70cb5b,#3fa34b);pointer-events:none}
+.hill{position:absolute;z-index:0;bottom:0;left:-10%;width:120%;height:78%;background:linear-gradient(155deg,#a0e879 0%,#65c958 48%,#399d4b 100%);border-radius:48% 48% 0 0/14% 14% 0 0}
+.path{position:absolute;z-index:1;left:13%;right:13%;top:24%;bottom:7%;border-radius:40% 40% 25% 25%;background:linear-gradient(90deg,#c79a5e 0%,#efd29a 20%,#f8e3b2 49%,#e7c58a 76%,#bd8c53 100%);border:5px solid #a97948;box-shadow:inset 0 0 0 4px #fff0c9,0 5px 0 #377f3c}
+.path:after{content:"";position:absolute;inset:10px;border-radius:35%;border:2px dashed #c7a36c;opacity:.55;background:repeating-linear-gradient(165deg,transparent 0 26px,#b98e5a22 27px 29px)}
+.level{position:absolute;z-index:3;left:10px;top:10px;background:#fff0c5;color:#854820;border:3px solid #c78a40;border-radius:12px;padding:8px 12px;text-align:center;font-weight:1000;box-shadow:0 3px #95682f;line-height:1.25}
+.level small{display:block;font-size:12px}
+.burrow{position:absolute;z-index:3;right:4%;top:22%;font-size:55px;filter:drop-shadow(0 5px 1px #80582d);transition:transform .2s;transform-origin:50% 80%}
+.burrow.open{transform:scale(1.12);filter:drop-shadow(0 0 12px #fff47a)}
+.carrot{position:absolute;z-index:2;left:6%;top:34%;font-size:28px;animation:bob 1.8s infinite ease-in-out}
+.flower{position:absolute;z-index:2;font-size:22px;animation:sway 2s ease-in-out infinite alternate;pointer-events:none}
+@keyframes bob{50%{transform:translateY(-4px)}}@keyframes sway{to{transform:rotate(12deg)}}
+.obstacle{position:absolute;z-index:2;font-size:clamp(25px,7vw,38px);filter:drop-shadow(0 3px 1px #315b2b66);pointer-events:none;transition:transform .2s}.obstacle.o1{left:27%;top:31%}.obstacle.o2{left:49%;top:56%}.obstacle.o3{right:26%;top:68%}.obstacle.hidden{display:none}
+.rabbits{position:absolute;z-index:4;left:23%;right:23%;top:43%;display:grid;grid-template-columns:repeat(3,1fr);gap:9px 5px}
+.rabbit{border:0;background:transparent;padding:0;aspect-ratio:1;min-width:0;position:relative;filter:drop-shadow(0 4px 2px #276b3588);animation:hop 1.9s ease-in-out infinite;transform-origin:50% 85%}
+.rabbit:nth-child(2n){animation-delay:-.5s}.rabbit:nth-child(3n){animation-delay:-.9s}
+.rabbit:active{transform:scale(.9)}.rabbit svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 1px 0 #ffffff66)}
+@keyframes hop{0%,100%{translate:0 0;rotate:0deg}50%{translate:0 -6px;rotate:-1deg}}
+.rabbit:nth-child(3n) svg{transform:rotate(3deg)}
+.rabbit:nth-child(4n) svg{transform:rotate(-3deg)}
+@media(prefers-reduced-motion:reduce){.cloud,.sun,.carrot,.flower,.rabbit{animation:none!important}}
+.rabbit.running{z-index:8;animation:none;pointer-events:none}
+.rabbit.gone{opacity:0;transform:scale(.1)!important;transition:opacity .25s,transform .25s}
+.rabbit.running svg{animation:runbody .12s infinite alternate}
+@keyframes runbody{to{translate:0 -4px}}
+.message{position:absolute;z-index:5;left:8%;right:8%;bottom:12px;text-align:center;font-weight:900;font-size:14px;text-shadow:0 2px #347a37;pointer-events:none}
+.tools{position:absolute;z-index:5;left:9px;right:9px;bottom:12px;display:grid;grid-template-columns:repeat(3,1fr) 58px;gap:8px;align-items:end}
+.tool{height:63px;border:3px solid #fff5c9;border-radius:15px;background:linear-gradient(180deg,#fff09a,#ffc044 65%,#f4a62c);color:#75441b;font-size:29px;box-shadow:0 5px #a76e27,inset 0 2px 0 #fff;position:relative;transition:transform .12s,filter .12s}.tool:active{transform:translateY(3px);box-shadow:0 2px #a76e27;filter:brightness(1.04)}
+.tool span{display:block;font-size:11px;font-weight:900}
+.tool.settings{font-size:25px;background:var(--cream);border-color:#e8d08a}
+.particle{position:absolute;z-index:9;pointer-events:none;font-weight:1000;color:#fff9a6;text-shadow:0 2px #3d8c42;animation:float .8s forwards}
+@keyframes float{to{transform:translateY(-40px) scale(1.2);opacity:0}}
+.note{position:relative;z-index:5;text-align:center;font-size:10px;color:#f1ffdf;margin-top:4px;text-shadow:0 1px #347a37}
+.overlay{position:fixed;z-index:30;inset:0;background:#173c2dcc;display:none;align-items:center;justify-content:center;padding:18px}
+.overlay.show{display:flex}.panel{width:min(100%,420px);max-height:85dvh;overflow:auto;background:linear-gradient(#fff9df,#ffe7ad);color:#684326;border:4px solid #f5ca66;border-radius:22px;padding:18px;box-shadow:0 12px 0 #7a4c2b;text-align:center}
+.panel h2{margin:0 0 8px}.panel p{line-height:1.45}.panel button{border:0;border-radius:13px;padding:12px 16px;background:#49a94f;color:white;font-weight:900;box-shadow:0 4px #277638;margin:5px}.panel .secondary{background:#e8a32c;box-shadow:0 4px #a76e27;color:#593715}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.panel-head h2{flex:1;text-align:left}.close-x{flex:0 0 38px;width:38px;height:38px;padding:0!important;margin:0!important;border-radius:50%!important;background:#e85b50!important;color:white!important;font-size:24px;line-height:1;box-shadow:0 3px #a83b35!important}.week-list{display:grid;gap:7px;text-align:left;margin:12px 0}.day-row{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff2c9;border:1px solid #f0d58d;border-radius:11px;padding:9px;font-size:13px}.day-row.active{outline:2px solid #49a94f}.day-row small{display:block;color:#87633c}.progress-track{height:10px;background:#e7d2a0;border-radius:20px;overflow:hidden;margin:8px 0}.progress-fill{height:100%;width:0;background:#49a94f;transition:width .2s}.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.stat{background:#fff2c9;border-radius:12px;padding:9px;font-weight:800}
+.scene{touch-action:manipulation}
+html.low-motion *,html.low-motion *::before,html.low-motion *::after{animation:none!important;transition:none!important}
+@media(max-height:740px){.scene{height:calc(100dvh - 230px);min-height:360px}.rabbits{top:41%}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+@media(max-height:650px){.scene{min-height:350px;height:calc(100dvh - 220px)}.rabbits{top:40%;gap:3px}.tools{bottom:8px}.tool{height:54px}}
+@media(max-width:360px){.game{padding-left:7px;padding-right:7px}.pill{padding:6px;font-size:13px}.rabbits{left:19%;right:19%;gap:4px}.tool{font-size:25px}.tool span{font-size:10px}}
+</style>
+</head>
+<body>
+<main class="game">
+<div class="cloud">☁️</div><div class="cloud c2">☁️</div>
+<header class="hud">
+ <button type="button" class="pill" id="coinWalletButton" aria-label="Ver moedas virtuais" style="width:100%;text-align:left"><span class="ico">🪙</span><span id="carrots">0</span><span>moedas</span><span aria-hidden="true">›</span></button>
+ <div class="pill"><span class="ico">⭐</span><span id="levelTop">Fase 1</span><span id="progress">0/9</span></div>
+</header>
+<div class="banner" id="banner">Ajude os coelhinhos a voltar para a toca!</div>
+<button id="dailyOpen" style="position:relative;z-index:5;display:block;margin:0 auto 8px;border:2px solid #fff3c0;border-radius:12px;padding:7px 13px;background:linear-gradient(#fff09a,#ffc044);color:#75441b;font-weight:900;box-shadow:0 3px #a76e27">📅 Desafios e recompensas virtuais</button>
+<section class="scene" id="scene" aria-label="Campo de jogo">
+ <div class="sun">☀️</div><div class="hill"></div><div class="path"></div>
+ <div class="level">FASE <span id="level">1</span><small id="goal">9 coelhinhos</small></div>
+ <div class="burrow" id="burrow">🕳️🐰</div>
+ <div class="carrot">🥕</div><div id="obstacle1" class="obstacle o1">🪵</div><div id="obstacle2" class="obstacle o2">🪨</div><div id="obstacle3" class="obstacle o3 hidden">🌵</div><div class="flower" style="left:8%;bottom:15%">🌼</div><div class="flower" style="right:8%;bottom:17%">🌸</div><div class="flower" style="left:14%;top:59%">🌷</div><div class="flower" style="right:13%;top:60%">🌻</div>
+ <div class="rabbits" id="rabbits"></div>
+ <div class="message" id="message">Toque em um coelhinho para guiá-lo até a toca!</div>
+</section>
+<div class="tools">
+ <button class="tool" id="hint" aria-label="Dica">🔎<span>DICA · 5</span></button>
+ <button class="tool" id="shuffle" aria-label="Misturar">🔄<span>MISTURAR · 5</span></button>
+ <button class="tool" id="herd" aria-label="Chamar todos">🐇<span>CHAMAR · 3</span></button>
+ <button class="tool settings" id="settings" aria-label="Ajuda">⚙️</button>
+</div>
+<div class="note">Versão de teste: anúncios e pagamentos reais ainda não estão conectados.</div>
+</main>
+<div class="overlay" id="dailyOverlay" role="dialog" aria-modal="true" aria-labelledby="dailyTitle">
+ <div class="panel"><div class="panel-head"><h2 id="dailyTitle">📅 Desafios do jogo</h2><button id="closeDailyX" class="close-x" aria-label="Fechar e voltar ao jogo" title="Voltar ao jogo">×</button></div>
+ <p>Os desafios e recompensas desta versão são apenas demonstrativos. Vamos ativar recompensas virtuais dentro do jogo quando a jogabilidade estiver pronta.</p>
+ <div class="stats"><div class="stat">🥕 Moedas virtuais<br><strong id="cashBalance">Sem valor em dinheiro</strong></div><div class="stat">📺 Anúncios<br><strong id="adCount">Ainda não ativos</strong></div></div>
+ <div class="progress-track"><div class="progress-fill" id="dailyFill"></div></div><p id="dailyStatus">Nenhum anúncio está sendo exibido ou contabilizado nesta versão.</p>
+ <button id="simulateAd" disabled>▶ Anúncios ainda não disponíveis</button><button id="claimDaily" class="secondary" disabled>Recompensa indisponível</button>
+ <div class="week-list" id="weekList"></div><p id="weeklyStatus">As recompensas serão apenas itens virtuais do jogo. Não há saldo em dinheiro.</p>
+ <button id="openWallet" class="secondary">🪙 Ver moedas virtuais</button><button id="closeDaily">Voltar ao jogo</button><p style="font-size:11px">Transparência: este arquivo HTML não contém anúncios reais, conta de usuário, pagamentos ou saques.</p></div></div>
+<div class="overlay" id="walletOverlay" role="dialog" aria-modal="true" aria-labelledby="walletTitle"><div class="panel"><div class="panel-head"><h2 id="walletTitle">🪙 Moedas do jogo</h2><button id="closeWalletX" class="close-x" aria-label="Fechar carteira">×</button></div><p>As cenouras e moedas são pontos virtuais para jogar. <strong>Não são dinheiro e não podem ser sacados.</strong></p><p id="walletBalance">Moedas virtuais</p><button id="requestWithdraw" disabled>Saques não disponíveis</button><button id="closeWallet" class="secondary">Voltar</button><p id="withdrawStatus" style="font-size:12px">Não informe chave Pix ou dados bancários neste protótipo. Nenhum sistema de pagamento está conectado.</p></div></div>
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="panelTitle">
+ <div class="panel"><h2 id="panelTitle">🐰 Coelhinhos em Fuga</h2><p id="panelText">Ajude todos os coelhinhos a chegar à toca.</p>
+ <div class="stats"><div class="stat">🥕 Cenouras<br><strong id="statCarrots">0</strong></div><div class="stat">🏆 Maior fase<br><strong id="statBest">1</strong></div></div>
+ <p><label><input id="motionToggle" type="checkbox" checked> Animações suaves (desative para economizar bateria)</label></p><p><label><input id="soundToggle" type="checkbox" checked> Efeitos sonoros</label></p><p><label><input id="musicToggle" type="checkbox"> Música contínua divertida e relaxante</label></p>
+ <button id="resume">Continuar jogando</button><button class="secondary" id="resetGame">Reiniciar progresso</button>
+ <p style="font-size:12px">O progresso fica salvo neste navegador. Cenouras são virtuais. Anúncios e pagamentos ainda não estão conectados.</p></div>
+</div>
+<!-- PREPARAÇÃO DE MONETIZAÇÃO: AdMob não funciona diretamente neste HTML aberto no Chrome. A integração real deve ser feita no app Android (SDK oficial), com IDs de anúncio próprios e IDs de teste durante o desenvolvimento. Anúncios recompensados só devem entregar itens virtuais não transferíveis; nunca dinheiro, Pix ou gift cards. -->
+<script>
+const $=id=>document.getElementById(id), grid=$('rabbits'), scene=$('scene');
+const SAVE_KEY='coelhinhosEmFugaSaveV2';
+const TASK_KEY='coelhinhosEmFugaWeeklyDemoV1';
+function money(c){return 'Moedas virtuais: '+Math.max(0,Number(c)||0)}
+function refreshTasks(){
+ const cash=$('cashBalance'); if(cash)cash.textContent='Sem valor em dinheiro';
+ const count=$('adCount'); if(count)count.textContent='Ainda não ativos';
+ const fill=$('dailyFill'); if(fill)fill.style.width='0%';
+ const status=$('dailyStatus'); if(status)status.textContent='Nenhum anúncio está sendo exibido ou contabilizado nesta versão.';
+ const sim=$('simulateAd'); if(sim)sim.disabled=true;
+ const claim=$('claimDaily'); if(claim){claim.disabled=true;claim.textContent='Recompensa indisponível';}
+ const weekly=$('weeklyStatus'); if(weekly)weekly.textContent='As recompensas serão itens virtuais do jogo; não há saldo em dinheiro.';
+ const list=$('weekList'); if(list)list.innerHTML='<div class="day-row"><span><strong>Próxima etapa</strong><small>Ativar desafios virtuais após os testes</small></span><strong>Em preparação</strong></div>';
+}
+$('dailyOpen').onclick=()=>{$('dailyOverlay').classList.add('show');refreshTasks()};
+const closeDaily=()=> $('dailyOverlay').classList.remove('show');$('closeDaily').onclick=closeDaily;$('closeDailyX').onclick=closeDaily;
+const closeWallet=()=> $('walletOverlay').classList.remove('show');
+const openWallet=()=>{$('walletBalance').textContent='Moedas virtuais';$('withdrawStatus').textContent='Não informe chave Pix ou dados bancários neste protótipo. Nenhum pagamento está conectado.';$('walletOverlay').classList.add('show')};
+$('openWallet').onclick=()=>{closeDaily();openWallet()};$('coinWalletButton').onclick=openWallet;$('closeWallet').onclick=closeWallet;$('closeWalletX').onclick=closeWallet;
+$('requestWithdraw').onclick=()=>{$('withdrawStatus').textContent='Saques não estão disponíveis. Nenhum pagamento real é enviado.'};
+$('simulateAd').onclick=()=>{};$('claimDaily').onclick=()=>{};
+let level=1, carrots=0, saved=0, busy=0, hints=5, shuffles=5, herds=3, total=9, bestLevel=1, reducedMotion=false, soundOn=true, musicOn=false, phaseDone=false;
+try{const old=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(old){level=Math.max(1,Number(old.level)||1);carrots=Math.max(0,Number(old.carrots)||0);bestLevel=Math.max(level,Number(old.bestLevel)||1);hints=Math.max(0,Number.isFinite(old.hints)?old.hints:5);shuffles=Math.max(0,Number.isFinite(old.shuffles)?old.shuffles:5);herds=Math.max(0,Number.isFinite(old.herds)?old.herds:3);reducedMotion=!!old.reducedMotion;soundOn=old.soundOn!==false;musicOn=!!old.musicOn}}catch(e){}
+function saveGame(){try{localStorage.setItem(SAVE_KEY,JSON.stringify({level,carrots,bestLevel,hints,shuffles,herds,reducedMotion,soundOn,musicOn}))}catch(e){$('message').textContent='Não foi possível salvar neste navegador.'}}
+function setMessage(text){$('message').textContent=text}
+function rabbitSVG(i){
+ const colors=['#fffaf0','#f3dfc5','#d8b28e','#f6f0e7','#e8c6a8'];
+ const fur=colors[(i+level)%colors.length]; const uid=`${level}_${i}`;
+ return `<svg viewBox="0 0 100 100" aria-label="Coelhinho">
+ <defs><radialGradient id="fur${uid}" cx="28%" cy="20%" r="85%"><stop stop-color="#fff"/><stop offset=".62" stop-color="${fur}"/><stop offset="1" stop-color="#b9a18b"/></radialGradient><radialGradient id="shade${uid}" cx="30%" cy="20%" r="90%"><stop stop-color="#fff"/><stop offset="1" stop-color="${fur}"/></radialGradient></defs>
+ <ellipse cx="49" cy="89" rx="30" ry="6" fill="#397c39" opacity=".35"/>
+ <ellipse cx="37" cy="24" rx="10" ry="25" transform="rotate(-12 37 24)" fill="url(#fur${uid})" stroke="#bca995" stroke-width="1.4"/>
+ <ellipse cx="38" cy="24" rx="4.5" ry="17" transform="rotate(-12 38 24)" fill="#e9a5aa"/>
+ <ellipse cx="62" cy="22" rx="10" ry="26" transform="rotate(10 62 22)" fill="url(#fur${uid})" stroke="#bca995" stroke-width="1.4"/>
+ <ellipse cx="62" cy="22" rx="4.5" ry="18" transform="rotate(10 62 22)" fill="#e9a5aa"/>
+ <ellipse cx="50" cy="60" rx="29" ry="29" fill="url(#shade${uid})" stroke="#bca995" stroke-width="1.2"/><ellipse cx="50" cy="76" rx="15" ry="10" fill="#fffaf2" opacity=".8"/><circle cx="22" cy="74" r="8" fill="url(#fur${uid})" stroke="#c9b6a1" stroke-width="1"/>
+ <ellipse cx="39" cy="57" rx="4" ry="5.5" fill="#382d2a"/><ellipse cx="61" cy="57" rx="4" ry="5.5" fill="#382d2a"/>
+ <ellipse cx="39" cy="54" rx="1.8" ry="2.5" fill="#fff"/><ellipse cx="61" cy="54" rx="1.8" ry="2.5" fill="#fff"/><path d="M34 51Q39 48 43 51M56 51Q61 48 66 51" fill="none" stroke="#fff" stroke-width="1.2" opacity=".8"/>
+ <ellipse cx="50" cy="67" rx="12" ry="9" fill="#fff4ed"/><path d="M46 64 Q50 60 54 64 Q50 70 46 64" fill="#d98591"/>
+ <path d="M50 69 Q48 75 43 72 M50 69 Q52 75 57 72" fill="none" stroke="#76594b" stroke-width="1.5" stroke-linecap="round"/>
+ <ellipse cx="29" cy="74" rx="9" ry="7" fill="#f0c1c0" opacity=".7"/><ellipse cx="71" cy="74" rx="9" ry="7" fill="#f0c1c0" opacity=".7"/>
+ <ellipse cx="30" cy="84" rx="11" ry="6" fill="url(#fur${uid})"/><ellipse cx="69" cy="84" rx="11" ry="6" fill="url(#fur${uid})"/>
+ </svg>`;
+}
+let audioCtx=null, musicTimer=null, musicStep=0;
+function getAudio(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;if(!audioCtx)audioCtx=new C();if(audioCtx.state==='suspended')audioCtx.resume();return audioCtx}catch(e){return null}}
+function tone(freq,duration=.1,wave='sine',volume=.045,delay=0){if(!soundOn)return;const ctx=getAudio();if(!ctx)return;try{const osc=ctx.createOscillator(),gain=ctx.createGain(),t=ctx.currentTime+delay;osc.type=wave;osc.frequency.setValueAtTime(freq,t);gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(volume,t+.018);gain.gain.exponentialRampToValueAtTime(.0001,t+duration);osc.connect(gain);gain.connect(ctx.destination);osc.start(t);osc.stop(t+duration+.025)}catch(e){}}
+function playTone(freq=660,duration=.08){tone(freq,duration)}
+function playSound(name){if(!soundOn)return;const sounds={tap:[[620,.045]],hop:[[440,.06],[590,.07]],save:[[660,.07],[880,.12]],win:[[523,.11],[659,.11],[784,.14],[1046,.2]],hint:[[740,.08],[988,.1]],shuffle:[[550,.06],[430,.06],[700,.08]],error:[[240,.13,'triangle']],coin:[[880,.06],[1175,.12]]};(sounds[name]||sounds.tap).forEach((n,i)=>tone(n[0],n[1],n[2]||'sine',.035,i*.075))}
+// Melodia original, suave e repetitiva, sintetizada no navegador para não carregar arquivos pesados.
+function stopMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null}}
+function startMusic(){stopMusic();if(!musicOn||!soundOn)return;getAudio();const melody=[523.25,659.25,783.99,659.25,587.33,698.46,880,698.46,523.25,659.25,783.99,987.77,880,783.99,659.25,587.33];const bass=[130.81,130.81,146.83,146.83,110,110,130.81,130.81];musicStep=0;musicTimer=setInterval(()=>{if(!musicOn||!soundOn){stopMusic();return}const i=musicStep++,ctx=getAudio();if(!ctx)return;const n=melody[i%melody.length];tone(n,.34,'sine',.010);if(i%2===0)tone(melody[(i+4)%melody.length]*1.5,.20,'sine',.003,0.10);if(i%4===0)tone(bass[Math.floor(i/2)%bass.length],.52,'triangle',.007);},360)}
+function setSound(on){soundOn=on;if(!soundOn)stopMusic();else if(musicOn)startMusic();saveGame();update()}
+function setMusic(on){musicOn=on;if(musicOn&&soundOn){getAudio();startMusic()}else stopMusic();saveGame();update()}
+function updateObstacles(){const sets=[['🪵','🪨',null],['🪨','🌵','🪵'],['🌳','🪵','🪨'],['🌵','🪨','🌳'],['🪵','🌳','🌵']];const set=sets[(level-1)%sets.length];['obstacle1','obstacle2','obstacle3'].forEach((id,i)=>{const el=$(id);el.textContent=set[i]||'';el.classList.toggle('hidden',!set[i]);});$('banner').textContent=level<3?'Cuidado com os obstáculos! Guie os 9 coelhinhos até a toca.':`Fase ${level}: caminho com novos obstáculos!`; }
+function update(){ $('soundToggle').checked=soundOn; $('musicToggle').checked=musicOn; $('carrots').textContent=carrots; $('statCarrots').textContent=carrots; $('statBest').textContent=bestLevel; $('motionToggle').checked=!reducedMotion; document.documentElement.classList.toggle('low-motion',reducedMotion); $('level').textContent=level; $('levelTop').textContent='Fase '+level; $('progress').textContent=saved+'/'+total; $('goal').textContent=(total-saved)+' coelhinhos'; $('hint').innerHTML='🔎<span>DICA · '+hints+'</span>'; $('shuffle').innerHTML='🔄<span>MISTURAR · '+shuffles+'</span>'; $('herd').innerHTML='🐇<span>CHAMAR · '+herds+'</span>'; }
+function render(){grid.innerHTML='';saved=0;busy=0;phaseDone=false;total=9;updateObstacles();for(let i=0;i<total;i++){const b=document.createElement('button');b.className='rabbit';b.innerHTML=rabbitSVG(i);b.setAttribute('aria-label','Levar coelhinho até a toca');b.onclick=()=>{playSound('tap');sendRabbit(b)};grid.appendChild(b)}update();$('banner').textContent='Ajude os coelhinhos a voltar para a toca!';saveGame();}
+function particle(x,y,t){if(reducedMotion)return;const p=document.createElement('div');p.className='particle';p.textContent=t;p.style.left=x+'px';p.style.top=y+'px';scene.appendChild(p);setTimeout(()=>p.remove(),850)}
+function sendRabbit(b){
+ if(!b||!b.isConnected||b.classList.contains('running')||phaseDone)return;
+ busy++;b.classList.add('running');
+ const a=b.getBoundingClientRect(),z=$('burrow').getBoundingClientRect(),s=scene.getBoundingClientRect();
+ const sx=a.left+a.width/2,sy=a.top+a.height/2,dx=z.left+z.width*.45-sx,dy=z.top+z.height*.65-sy,sign=dx>=0?1:-1;
+ $('message').textContent=['Pula, pula, coelhinho! 🐇','Desviando do obstáculo! 💨','Corre para casa! ✨'][Math.floor(Math.random()*3)];playSound('hop');
+ $('burrow').classList.add('open');particle(sx-s.left,sy-s.top,'✨');
+ if(reducedMotion){b.classList.add('gone');setTimeout(()=>finishRabbit(b,z,s),40);return;}
+ const anim=b.animate([
+ {transform:'translate(0,0) scale(1)',offset:0},
+ {transform:`translate(${dx*.12}px,${dy*.18-24}px) rotate(${sign*8}deg) scale(1.08)`,offset:.18},
+ {transform:`translate(${dx*.38}px,${dy*.35-58}px) rotate(${sign*18}deg) scale(1.02)`,offset:.38},
+ {transform:`translate(${dx*.58}px,${dy*.55-18}px) rotate(${sign*8}deg) scale(.9)`,offset:.58},
+ {transform:`translate(${dx*.82}px,${dy*.78}px) rotate(${sign*5}deg) scale(.68)`,offset:.78},
+ {transform:`translate(${dx}px,${dy}px) scale(.2)`,opacity:.2,offset:1}
+ ],{duration:1050,easing:'cubic-bezier(.18,.72,.25,1)',fill:'forwards'});
+ anim.onfinish=()=>finishRabbit(b,z,s);
+}
+function finishRabbit(b,z,s){if(!b.isConnected)return;b.classList.add('gone');setTimeout(()=>{if(!b.isConnected)return;b.remove();busy=Math.max(0,busy-1);saved++;carrots++;playSound('save');update();particle(Math.max(8,z.left-s.left+z.width/2),Math.max(15,z.top-s.top+z.height/2),'+1 🥕');setMessage('Chegou em casa! +1 cenoura 🥕');saveGame();if(grid.querySelectorAll('.rabbit:not(.running)').length===0&&busy===0&&!phaseDone){phaseDone=true;playSound('win');carrots+=5;level++;bestLevel=Math.max(bestLevel,level);saveGame();setMessage('Fase concluída! Bônus de 5 cenouras! 🎉');$('banner').textContent='Muito bem! Você salvou todos!';update();setTimeout(()=>{render();setMessage('Nova fase! Mais coelhinhos precisam de ajuda!')},reducedMotion?250:1250)}},reducedMotion?0:180)}
+$('hint').onclick=()=>{playSound('tap');if(hints<=0){playSound('error');$('message').textContent='Você usou todas as dicas desta versão.';return}const b=grid.querySelector('.rabbit:not(.running)');if(!b)return;hints--;playSound('hint');b.style.filter='drop-shadow(0 0 11px #fff36b)';$('message').textContent='Experimente tocar neste coelhinho!';update();setTimeout(()=>{if(b.isConnected)b.style.filter=''},1200)};
+$('shuffle').onclick=()=>{playSound('tap');if(shuffles<=0){playSound('error');$('message').textContent='Você usou todas as misturas.';return}shuffles--;playSound('shuffle');[...grid.children].sort(()=>Math.random()-.5).forEach(b=>grid.appendChild(b));$('message').textContent='Os coelhinhos mudaram de lugar!';update()};
+$('herd').onclick=()=>{playSound('tap');if(herds<=0){playSound('error');$('message').textContent='Você usou todas as chamadas.';return}herds--;[...grid.querySelectorAll('.rabbit:not(.running)')].forEach((b,i)=>setTimeout(()=>sendRabbit(b),i*140));$('message').textContent='Chamando o grupo inteiro! 🐇';update()};
+$('settings').onclick=()=>{$('overlay').classList.add('show');update()};
+$('resume').onclick=()=>{$('overlay').classList.remove('show');playSound('tap')};
+$('soundToggle').addEventListener('change',e=>setSound(e.target.checked));
+$('musicToggle').addEventListener('change',e=>{setMusic(e.target.checked);if(e.target.checked)playSound('win')});
+$('resetGame').onclick=()=>{if(confirm('Reiniciar o progresso salvo?')){level=1;carrots=0;bestLevel=1;hints=5;shuffles=5;herds=3;saveGame();render();$('overlay').classList.remove('show');playSound('tap')}};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopMusic();else if(musicOn&&soundOn)startMusic()});
+render();
+</script>
+
+<script>
+// Recuperação simples para navegador Android: só cria coelhinhos se o script principal não os criou.
+(function(){
+ const byId=id=>document.getElementById(id), rabbits=byId('rabbits');
+ if(rabbits && rabbits.children.length===0){
+  function addRabbits(){
+   rabbits.innerHTML='';
+   for(let i=0;i<9;i++){
+    const b=document.createElement('button'); b.type='button'; b.className='rabbit';
+    b.setAttribute('aria-label','Levar coelhinho até a toca');
+    b.innerHTML='<span style="display:block;font-size:clamp(34px,10vw,54px);line-height:1.2;text-shadow:0 3px 2px #765">'+['🐇','🐰','🐇'][i%3]+'</span>';
+    b.addEventListener('click',function(){if(b.dataset.done)return;b.dataset.done='1';b.style.opacity='0';b.style.transform='translate(35px,-35px) scale(.2)';const c=byId('carrots');if(c)c.textContent=String((parseInt(c.textContent,10)||0)+1);const msg=byId('message');if(msg)msg.textContent='Coelhinho chegou à toca! 🐰 +1 moeda';setTimeout(()=>{b.remove();if(!rabbits.children.length){if(msg)msg.textContent='Todos chegaram! Nova rodada! 🎉';setTimeout(addRabbits,900)}},350)});
+    rabbits.appendChild(b);
+   }
+  }
+  addRabbits();
+ }
+ window.addEventListener('error',function(){const msg=byId('message');if(msg)msg.textContent='Ocorreu um erro no jogo. Feche e abra novamente o arquivo no Chrome.'});
+})();
+</script>
+
+</body></html>
